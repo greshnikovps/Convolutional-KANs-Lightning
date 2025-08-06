@@ -17,7 +17,7 @@ from architectures_28x28.KKAN import KKAN_Convolutional_Network
 from architectures_28x28.conv_and_kan import NormalConvsKAN
 from architectures_28x28.CKAN_BN import CKAN_BN
 from architectures_28x28.KANConvs_MLP import *
-from architectures_28x28.KANConvs_MLP_2 import KANC_MLP_2
+from architectures_28x28.KANConvs_MLP_2 import KANC_MLP_Big
 from architectures_28x28.SimpleModels import *
 from architectures_28x28.ConvNet import ConvNet
 from evaluations import *
@@ -50,11 +50,11 @@ def join_path(name,pa):
   print(os.path.join(pa,name+".pt"))
   return os.path.join(pa,name+".pt")
 
-model_KANC_MLP_2= KANC_MLP_2()
+model_KANC_MLP_2= KANC_MLP_Big()
 
 train_model_generic(model_KANC_MLP_2, mnist_train, mnist_test,device,epochs = 20,path=path)#train_and_test_models(model_KANC_MLP_2, device, train_loader, test_loader, optimizer_KANC_MLP_2, criterion_KANC_MLP_2, epochs=12, scheduler=scheduler_KANC_MLP_2)
 
-model_KANC_MLP= KANC_MLP()
+'''model_KANC_MLP= KANC_MLP()
 train_model_generic(model_KANC_MLP, mnist_train, mnist_test,device,epochs = 20,path=path)
 
 
@@ -77,4 +77,4 @@ model_SimpleCNN_2 = SimpleCNN_2()
 train_model_generic(model_SimpleCNN_2, mnist_train, mnist_test,device,epochs = 20,path=path)
 
 model_SimpleLinear = SimpleLinear()
-train_model_generic(model_SimpleLinear, mnist_train, mnist_test,device,epochs = 20,path=path)
+train_model_generic(model_SimpleLinear, mnist_train, mnist_test,device,epochs = 20,path=path)'''
