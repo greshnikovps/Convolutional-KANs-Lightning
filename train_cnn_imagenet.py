@@ -117,6 +117,21 @@ class CNNConvNet(pl.LightningModule):
         
         return loss
     
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = self.criterion(logits, y)
+        
+        # Metrics
+        self.val_acc(logits, y)  # Reuse val_acc for test
+        self.val_acc_top5(logits, y)  # Reuse val_acc_top5 for test
+        
+        self.log('test_loss', loss, prog_bar=True)
+        self.log('test_acc', self.val_acc, prog_bar=True)
+        self.log('test_acc_top5', self.val_acc_top5, prog_bar=True)
+        
+        return loss
+    
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(
             self.parameters(),
