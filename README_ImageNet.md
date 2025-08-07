@@ -1,25 +1,25 @@
 # KAN Convolutional Models on ImageNet
 
-Этот проект содержит реализацию конволюционных KAN (Kolmogorov-Arnold Networks) моделей для классификации изображений на датасете ImageNet, а также сравнение с обычными CNN моделями.
+This project contains implementation of convolutional KAN (Kolmogorov-Arnold Networks) models for image classification on the ImageNet dataset, as well as comparison with standard CNN models.
 
-## Структура проекта
+## Project Structure
 
-- `kan_convolutional/KANLightningModel.py` - Lightning модуль для KAN конволюционной модели
-- `train_kan_imagenet.py` - Скрипт для обучения KAN модели на ImageNet
-- `train_cnn_imagenet.py` - Скрипт для обучения обычной CNN модели на ImageNet
-- `compare_models.py` - Скрипт для сравнения результатов обучения
-- `requirements_imagenet.txt` - Зависимости для проекта
+- `kan_convolutional/KANLightningModel.py` - Lightning module for KAN convolutional model
+- `train_kan_imagenet.py` - Script for training KAN model on ImageNet
+- `train_cnn_imagenet.py` - Script for training standard CNN model on ImageNet
+- `compare_models.py` - Script for comparing training results
+- `requirements_imagenet.txt` - Project dependencies
 
-## Установка
+## Installation
 
-1. Установите зависимости:
+1. Install dependencies:
 ```bash
 pip install -r requirements_imagenet.txt
 ```
 
-2. Подготовьте датасет ImageNet:
-   - Скачайте ImageNet датасет
-   - Распакуйте в папку с следующей структурой:
+2. Prepare ImageNet dataset:
+   - Download ImageNet dataset
+   - Extract to folder with the following structure:
 ```
 imagenet/
 ├── train/
@@ -32,7 +32,7 @@ imagenet/
     └── ...
 ```
 
-## Обучение KAN модели
+## Training KAN Model
 
 ```bash
 python train_kan_imagenet.py \
@@ -46,16 +46,16 @@ python train_kan_imagenet.py \
     --precision 16
 ```
 
-### Параметры KAN модели:
-- `--grid_size`: Размер сетки для KAN (по умолчанию: 5)
-- `--spline_order`: Порядок сплайна (по умолчанию: 3)
-- `--scale_noise`: Масштаб шума (по умолчанию: 0.1)
-- `--scale_base`: Масштаб базовой функции (по умолчанию: 1.0)
-- `--scale_spline`: Масштаб сплайна (по умолчанию: 1.0)
-- `--regularize_activation`: Регуляризация активации (по умолчанию: 1.0)
-- `--regularize_entropy`: Регуляризация энтропии (по умолчанию: 1.0)
+### KAN Model Parameters:
+- `--grid_size`: Grid size for KAN (default: 5)
+- `--spline_order`: Spline order (default: 3)
+- `--scale_noise`: Noise scale (default: 0.1)
+- `--scale_base`: Base function scale (default: 1.0)
+- `--scale_spline`: Spline scale (default: 1.0)
+- `--regularize_activation`: Activation regularization (default: 1.0)
+- `--regularize_entropy`: Entropy regularization (default: 1.0)
 
-## Обучение CNN модели
+## Training CNN Model
 
 ```bash
 python train_cnn_imagenet.py \
@@ -67,9 +67,9 @@ python train_cnn_imagenet.py \
     --precision 16
 ```
 
-## Сравнение моделей
+## Model Comparison
 
-После обучения обеих моделей, используйте скрипт сравнения:
+After training both models, use the comparison script:
 
 ```bash
 python compare_models.py \
@@ -79,58 +79,58 @@ python compare_models.py \
     --create_plots
 ```
 
-## Архитектура моделей
+## Model Architectures
 
-### KAN модель:
-- 4 конволюционных слоя с KAN ядрами
-- Размеры каналов: 3 → 64 → 128 → 256 → 512
-- Размеры ядер: 7x7, 3x3, 3x3, 3x3
+### KAN Model:
+- 4 convolutional layers with KAN kernels
+- Channel sizes: 3 → 64 → 128 → 256 → 512
+- Kernel sizes: 7x7, 3x3, 3x3, 3x3
 - Global Average Pooling
-- KAN классификатор
+- KAN classifier
 
-### CNN модель:
-- 4 конволюционных слоя с обычными ядрами
-- Batch Normalization после каждого слоя
-- Размеры каналов: 3 → 64 → 128 → 256 → 512
-- Размеры ядер: 7x7, 3x3, 3x3, 3x3
+### CNN Model:
+- 4 convolutional layers with standard kernels
+- Batch Normalization after each layer
+- Channel sizes: 3 → 64 → 128 → 256 → 512
+- Kernel sizes: 7x7, 3x3, 3x3, 3x3
 - Global Average Pooling
-- Линейный классификатор
+- Linear classifier
 
-## Мониторинг обучения
+## Training Monitoring
 
-Используйте TensorBoard для мониторинга:
+Use TensorBoard for monitoring:
 
 ```bash
 tensorboard --logdir logs
 ```
 
-## Результаты
+## Results
 
-Скрипт сравнения выводит:
-- Количество параметров каждой модели
-- Размер модели в MB
-- Loss, Top-1 и Top-5 точность
-- Различия между моделями
-- Сохраняет результаты в JSON файл
-- Создает графики сравнения (опционально)
+The comparison script outputs:
+- Number of parameters for each model
+- Model size in MB
+- Loss, Top-1 and Top-5 accuracy
+- Differences between models
+- Saves results to JSON file
+- Creates comparison plots (optional)
 
-## Особенности KAN моделей
+## KAN Model Features
 
-1. **Нелинейные ядра**: KAN ядра могут обучать сложные нелинейные функции
-2. **Регуляризация**: Встроенная регуляризация через сплайны
-3. **Интерпретируемость**: Возможность анализа обученных функций
-4. **Адаптивность**: Автоматическая адаптация сетки к данным
+1. **Non-linear kernels**: KAN kernels can learn complex non-linear functions
+2. **Regularization**: Built-in regularization through splines
+3. **Interpretability**: Ability to analyze learned functions
+4. **Adaptability**: Automatic grid adaptation to data
 
-## Требования к системе
+## System Requirements
 
-- CUDA-совместимая GPU (рекомендуется)
-- Минимум 16GB RAM
-- Достаточно места на диске для ImageNet (~150GB)
+- CUDA-compatible GPU (recommended)
+- Minimum 16GB RAM
+- Sufficient disk space for ImageNet (~150GB)
 - Python 3.8+
 
-## Примечания
+## Notes
 
-- Для полного обучения на ImageNet потребуется значительное время
-- Рекомендуется использовать смешанную точность (precision=16)
-- Модели автоматически сохраняются в папку `checkpoints/`
-- Логи сохраняются в папку `logs/` для TensorBoard 
+- Full training on ImageNet will require significant time
+- Recommended to use mixed precision (precision=16)
+- Models are automatically saved to `checkpoints/` folder
+- Logs are saved to `logs/` folder for TensorBoard 
