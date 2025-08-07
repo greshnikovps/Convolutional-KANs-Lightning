@@ -99,10 +99,16 @@ class KANConvNetVanilla(nn.Module):
     
     def get_regularization_loss(self, regularize_activation: float = 1.0, regularize_entropy: float = 1.0):
         """Compute regularization loss from all KAN layers"""
+        # Handle DataParallel models
+        if hasattr(self, 'module'):
+            model = self.module
+        else:
+            model = self
+            
         reg_loss = 0.0
         
         # Add regularization from convolutional layers
-        for conv_layer in self.conv_layers:
+        for conv_layer in model.conv_layers:
             for conv in conv_layer.convs:
                 reg_loss += conv.conv.regularization_loss(
                     regularize_activation, 
@@ -110,7 +116,7 @@ class KANConvNetVanilla(nn.Module):
                 )
         
         # Add regularization from classifier
-        reg_loss += self.classifier.regularization_loss(
+        reg_loss += model.classifier.regularization_loss(
             regularize_activation, 
             regularize_entropy
         )
@@ -119,8 +125,14 @@ class KANConvNetVanilla(nn.Module):
     
     def count_parameters(self):
         """Count total number of parameters"""
-        total_params = sum(p.numel() for p in self.parameters())
-        trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        # Handle DataParallel models
+        if hasattr(self, 'module'):
+            model = self.module
+        else:
+            model = self
+            
+        total_params = sum(p.numel() for p in model.parameters())
+        trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         
         return {
             'total_parameters': total_params,

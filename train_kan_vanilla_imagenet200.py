@@ -94,6 +94,7 @@ def train_epoch(model, train_loader, criterion, optimizer, device, regularize_ac
     
     pbar = tqdm(train_loader, desc='Training')
     for batch_idx, (data, target) in enumerate(pbar):
+        # Move data to device (DataParallel handles the rest)
         data, target = data.to(device), target.to(device)
         
         optimizer.zero_grad()
@@ -136,6 +137,7 @@ def validate(model, val_loader, criterion, device):
     with torch.no_grad():
         pbar = tqdm(val_loader, desc='Validation')
         for data, target in pbar:
+            # Move data to device (DataParallel handles the rest)
             data, target = data.to(device), target.to(device)
             output = model(data)
             loss = criterion(output, target)
@@ -162,7 +164,7 @@ def main():
     parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of workers for dataloader')
-    parser.add_argument('--gpu', type=int, default=0, help='GPU device ID')
+    parser.add_argument('--gpu', type=int, default=None, help='Specific GPU device ID (if None, use all available GPUs)')
     
     # KAN-specific parameters
     parser.add_argument('--grid_size', type=int, default=5, help='Grid size for KAN layers')
@@ -180,8 +182,16 @@ def main():
     args = parser.parse_args()
     
     # Set device
-    device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
-    print(f"Using device: {device}")
+    if torch.cuda.is_available():
+        if args.gpu is not None:
+            device = torch.device(f'cuda:{args.gpu}')
+            print(f"Using specific GPU: {device}")
+        else:
+            device = torch.device('cuda')
+            print(f"Using all available GPUs: {torch.cuda.device_count()} GPUs")
+    else:
+        device = torch.device('cpu')
+        print(f"Using device: {device}")
     
     # Parse layer configuration
     conv_layers = parse_layer_config(args.layers)
@@ -199,6 +209,11 @@ def main():
     )
     
     model = model.to(device)
+    
+    # Use DataParallel if multiple GPUs are available and no specific GPU is specified
+    if torch.cuda.is_available() and args.gpu is None and torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model)
+        print(f"Using DataParallel with {torch.cuda.device_count()} GPUs")
     
     # Print model information
     param_info = model.count_parameters()
@@ -261,6 +276,7 @@ def main():
         # Save best model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
+            # Save the model state dict (DataParallel handles this automatically)
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
@@ -272,6 +288,7 @@ def main():
         
         # Save checkpoint every 10 epochs
         if (epoch + 1) % 10 == 0:
+            # Save the model state dict (DataParallel handles this automatically)
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
@@ -281,6 +298,7 @@ def main():
             }, f"checkpoints/kan_vanilla_imagenet200_epoch_{epoch+1}.pt")
     
     # Save final model
+    # Save the model state dict (DataParallel handles this automatically)
     torch.save({
         'epoch': args.epochs,
         'model_state_dict': model.state_dict(),
