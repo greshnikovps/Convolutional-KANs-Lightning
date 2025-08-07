@@ -216,7 +216,11 @@ def main():
         print(f"Using DataParallel with {torch.cuda.device_count()} GPUs")
     
     # Print model information
-    param_info = model.count_parameters()
+    # Handle DataParallel models for parameter counting
+    if hasattr(model, 'module'):
+        param_info = model.module.count_parameters()
+    else:
+        param_info = model.count_parameters()
     print("=" * 50)
     print("KAN MODEL INFORMATION (VANILLA)")
     print("=" * 50)
